@@ -1,9 +1,4 @@
-require 'models/skill_inventory'
-
 class SkillInventoryApp < Sinatra::Base
-  set :root, File.expand_path("..", __dir__)
-  set :method_override, true
-
 
   get '/' do
     erb :dashboard
@@ -44,7 +39,11 @@ class SkillInventoryApp < Sinatra::Base
    end
 
   def skill_inventory
+    if ENV['RACK_ENV'] == 'test'
+      database = YAML::Store.new('db/skill_inventory_test')
+    else
     database = YAML::Store.new('db/skill_inventory')
+    end
     @skill_inventory ||= SkillInventory.new(database)
   end
 end
