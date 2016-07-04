@@ -1,3 +1,5 @@
+require 'sqlite3'
+
 class SkillInventoryApp < Sinatra::Base
 
   get '/' do
@@ -13,10 +15,16 @@ class SkillInventoryApp < Sinatra::Base
     erb :new
   end
 
+  get '/skills/:id' do |id|
+    @skill = skill_inventory.find(id.to_i)
+    erb :show
+  end
+
   post '/skills' do
     skill_inventory.create(params[:skill])
     redirect '/skills'
   end
+
 
   get '/skills/:id/edit' do |id|
     @skill = skill_inventory.find(id.to_i)
@@ -28,22 +36,22 @@ class SkillInventoryApp < Sinatra::Base
     redirect "/skills/#{id}"
   end
 
-  get '/skills/:id' do |id|
-    @skill = skill_inventory.find(id.to_i)
-    erb :show
+  delete '/skills/:id' do |id|
+    skill_inventory.destroy(id.to_i)
+    redirect '/skills'
   end
 
-  delete '/skills/:id' do |id|
-     skill_inventory.destroy(id.to_i)
-     redirect '/skills'
-   end
-
   def skill_inventory
-    if ENV['RACK_ENV'] == 'test'
-      database = YAML::Store.new('db/skill_inventory_test')
+    if ENV['RACK_ENV'] == "test"
+      database = SQLite3::Database.new("db/skill_inventory_test.db")
     else
-    database = YAML::Store.new('db/skill_inventory')
+      database = SQLite3::Database.new("db/skill_inventory_development.db")
     end
+    database.results_as_hash = true
     @skill_inventory ||= SkillInventory.new(database)
+  end
+
+  not_found do
+    erb :error
   end
 end

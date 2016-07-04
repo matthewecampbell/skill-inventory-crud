@@ -1,5 +1,3 @@
-require 'yaml/store'
-
 class SkillInventory
   attr_reader :database
 
@@ -8,18 +6,11 @@ class SkillInventory
   end
 
   def create(skill)
-    database.transaction do
-      database['skills'] ||= []
-      database['total'] ||= 0
-      database['total'] += 1
-      database['skills'] << { "id" => database['total'], "title" => skill[:title], "description" => skill[:description] }
-    end
+    database.execute("INSERT INTO skills (title, description) VALUES (?, ?);", skill[:title], skill[:description])
   end
 
   def raw_skills
-    database.transaction do
-      database['skills'] || []
-    end
+    database.execute("SELECT * FROM skills;")
   end
 
   def all
@@ -27,7 +18,7 @@ class SkillInventory
   end
 
   def raw_skill(id)
-    raw_skills.find { |skill| skill["id"] == id }
+    database.execute("SELECT * FROM skills WHERE id = ?;", id).first
   end
 
   def find(id)
@@ -35,23 +26,14 @@ class SkillInventory
   end
 
   def update(id, skill)
-    database.transaction do
-      target = database['skills'].find { |data| data["id"] == id }
-      target["title"] = skill[:title]
-      target["description"] = skill[:description]
-    end
+    database.execute("UPDATE skills SET title= ?, description= ? WHERE id = ?;", skill[:title], skill[:description], id)
   end
 
   def destroy(id)
-     database.transaction do
-       database['skills'].delete_if { |skill| skill["id"] == id }
-     end
-   end
+    database.execute("DELETE FROM skills WHERE id = ?;", id)
+  end
 
-   def delete_all
-     database.transaction do
-       database["skills"] = []
-       database["total"] = 0
-     end
-   end
+  def delete_all
+    database.execute("DELETE FROM skills;")
+  end
 end

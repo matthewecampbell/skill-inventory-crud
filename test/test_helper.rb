@@ -6,6 +6,8 @@ require 'minitest/autorun'
 require 'minitest/pride'
 require 'capybara/dsl'
 require 'launchy'
+require 'sqlite3'
+require 'tilt/erb'
 
 module TestHelpers
   def teardown
@@ -14,7 +16,8 @@ module TestHelpers
   end
 
   def skill_inventory
-    database = YAML::Store.new('db/skill_inventory_test')
+    database = SQLite3::Database.new('db/skill_inventory_test.db')
+    database.results_as_hash = true
     @database ||= SkillInventory.new(database)
   end
 end
