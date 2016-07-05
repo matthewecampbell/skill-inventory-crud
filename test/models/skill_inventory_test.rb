@@ -35,4 +35,11 @@ class SkillInventoryTest < Minitest::Test
     skill_inventory.destroy(id)
     assert_equal [], skill_inventory.all
   end
+
+  def test_it_can_delete_all
+    skill_inventory.create(title: "Houston Texans", description: "NFL Football Team")
+    assert_equal 2, skill_inventory.all.count
+    skill_inventory.delete_all
+    assert_equal 0, skill_inventory.all.count
+  end
 end
