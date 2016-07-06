@@ -1,14 +1,16 @@
-<div>
 
-<h1 class="well text-center">All Skills</h1>
+<h1 id='title' class="well text-center">All Skills</h1>
 
+<div id="skill_list">
 <% @skills.each do |skill| %>
+  <div id="<%= skill.id%>">
   <h3>(<%= skill.id %>) <a href="/skills/<%= skill.id %>"><%= skill.title %></a></h3>
-  <a href="/skills/<%= skill.id %>/edit">Edit</a>
+  <a class="btn btn-primary col-md-1" href="/skills/<%= skill.id %>/edit">Edit</a>
   <form action="/skills/<%= skill.id %>" method="POST">
     <input type="hidden" name="_method" value="DELETE">
-    <input type="submit" value="delete"/>
+    <button type="submit" class="btn btn-danger col-md-1">Delete</button><br/>
   </form>
+</div>
 <% end %>
 
 </div>
